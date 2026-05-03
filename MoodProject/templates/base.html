@@ -1,0 +1,67 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Mood Recommender{% endblock %}</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+<body>
+
+    <!-- ✅ MESSAGES -->
+    {% if messages %}
+    <div class="custom-messages">
+        {% for message in messages %}
+            <div class="msg {{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- ✅ NAVBAR (FIXED) -->
+    {% if request.session.user %}
+    <header>
+        <div class="header-left">
+            <div class="logo">🎭 Mood Recommender</div>
+            {% if request.resolver_match.url_name != 'home' %}
+            <a href="{% url 'home' %}" class="back-btn">← Back</a>
+            {% endif %}
+        </div>
+
+        <nav class="nav-links">
+            <a href="{% url 'home' %}">Home</a>
+            <a href="{% url 'history' %}">History</a>
+            <a href="{% url 'analytics' %}">📊 Analytics</a>
+
+            <span class="divider">|</span>
+
+            <span class="user">Hello, <strong>{{ request.session.user }}</strong></span>
+
+            <a href="{% url 'logout' %}" class="logout-btn">Logout</a>
+        </nav>
+    </header>
+    {% endif %}
+
+    <!-- ❌ REMOVE DUPLICATE MESSAGES BLOCK (deleted) -->
+
+    {% block content %}{% endblock %}
+
+    <footer class="footer">
+        <p>✨ Made with ❤️ </p>
+    </footer>
+
+    <!-- ✅ AUTO HIDE MESSAGE -->
+    <script>
+    setTimeout(() => {
+        const msg = document.querySelector('.custom-messages');
+        if (msg) msg.style.display = 'none';
+    }, 3000);
+    </script>
+
+</body>
+</html>

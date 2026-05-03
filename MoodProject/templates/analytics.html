@@ -1,0 +1,533 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mood Analytics - Mood Recommender{% endblock %}
+
+{% block content %}
+<div class="analytics-container">
+    <div class="analytics-header">
+        <h1>📊 Mood Analytics Dashboard</h1>
+        <p class="subtitle">Your mood patterns and insights at a glance</p>
+    </div>
+
+    <!-- ✅ STATISTICS CARDS -->
+    <div class="stats-grid">
+        
+        <!-- TOTAL MOODS CARD -->
+        <div class="stat-card total">
+            <div class="stat-icon">📈</div>
+            <div class="stat-content">
+                <h3>Total Moods</h3>
+                <p class="stat-value">{{ total_moods }}</p>
+            </div>
+        </div>
+
+        <!-- MOST COMMON MOOD CARD -->
+        <div class="stat-card most-common">
+            <div class="stat-icon">
+                {% if most_common_mood == "Happy" %}
+                    😊
+                {% elif most_common_mood == "Sad" %}
+                    😢
+                {% elif most_common_mood == "Stressed" %}
+                    😤
+                {% else %}
+                    🎵
+                {% endif %}
+            </div>
+            <div class="stat-content">
+                <h3>Most Common</h3>
+                <p class="stat-value">{{ most_common_mood }}</p>
+            </div>
+        </div>
+
+        <!-- HAPPY COUNT CARD -->
+        <div class="stat-card happy">
+            <div class="stat-icon">😊</div>
+            <div class="stat-content">
+                <h3>Happy</h3>
+                <p class="stat-value">{{ mood_counts.Happy }}</p>
+                <p class="stat-percent">{{ mood_percentages.Happy }}%</p>
+            </div>
+        </div>
+
+        <!-- SAD COUNT CARD -->
+        <div class="stat-card sad">
+            <div class="stat-icon">😢</div>
+            <div class="stat-content">
+                <h3>Sad</h3>
+                <p class="stat-value">{{ mood_counts.Sad }}</p>
+                <p class="stat-percent">{{ mood_percentages.Sad }}%</p>
+            </div>
+        </div>
+
+        <!-- STRESSED COUNT CARD -->
+        <div class="stat-card stressed">
+            <div class="stat-icon">😤</div>
+            <div class="stat-content">
+                <h3>Stressed</h3>
+                <p class="stat-value">{{ mood_counts.Stressed }}</p>
+                <p class="stat-percent">{{ mood_percentages.Stressed }}%</p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ✅ CHART SECTION -->
+    <div class="chart-section">
+        <div class="chart-wrapper">
+            <h2>Mood Distribution</h2>
+            
+            {% if total_moods > 0 %}
+                <!-- Canvas for Chart.js -->
+                <div class="chart-container">
+                    <canvas id="moodChart" width="400" height="200"></canvas>
+                </div>
+            {% else %}
+                <!-- NO DATA MESSAGE -->
+                <div class="no-data">
+                    <p>📊 No mood data yet. Start detecting moods to see your analytics!</p>
+                    <a href="{% url 'mood_input' %}" class="btn-detect">🎯 Detect Your Mood</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- ✅ INSIGHTS SECTION -->
+    {% if total_moods > 0 %}
+    <div class="insights-section">
+        <h2>💡 Your Mood Insights</h2>
+        <div class="insights-grid">
+            
+            <!-- INSIGHT 1 -->
+            {% if mood_counts.Happy > mood_counts.Sad and mood_counts.Happy > mood_counts.Stressed %}
+                <div class="insight-card positive">
+                    <h3>✨ Positive Vibes</h3>
+                    <p>You've been feeling mostly happy and positive! Keep spreading that good energy! 🌟</p>
+                </div>
+            {% elif mood_counts.Sad > mood_counts.Happy and mood_counts.Sad > mood_counts.Stressed %}
+                <div class="insight-card cautious">
+                    <h3>💙 Take Care</h3>
+                    <p>You've been experiencing some sadness. Remember, it's okay to feel down sometimes. Reach out to someone! 💙</p>
+                </div>
+            {% elif mood_counts.Stressed > mood_counts.Happy and mood_counts.Stressed > mood_counts.Sad %}
+                <div class="insight-card calm">
+                    <h3>🧘 Relax & Breathe</h3>
+                    <p>You've been feeling stressed lately. Try meditation or music to calm your mind. You got this! 🌿</p>
+                </div>
+            {% else %}
+                <div class="insight-card balanced">
+                    <h3>⚖️ Well Balanced</h3>
+                    <p>Your moods are well balanced! You experience a healthy mix of emotions. That's great! 🎉</p>
+                </div>
+            {% endif %}
+
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+
+<!-- ✅ CHART.JS CDN (Version 4.4.0) -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- ✅ CHART INITIALIZATION SCRIPT -->
+<script>
+    // Wait for page load
+    window.addEventListener('load', function() {
+        {% if total_moods > 0 %}
+            
+            var ctx = document.getElementById('moodChart');
+            
+            if (ctx) {
+                var myChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Happy', 'Sad', 'Stressed'],
+                        datasets: [{
+                            label: 'Mood Count',
+                            data: [{{ mood_counts.Happy }}, {{ mood_counts.Sad }}, {{ mood_counts.Stressed }}],
+                            backgroundColor: [
+                                'rgba(253, 183, 80, 0.8)',
+                                'rgba(52, 152, 219, 0.8)',
+                                'rgba(168, 216, 234, 0.8)'
+                            ],
+                            borderColor: [
+                                'rgba(253, 183, 80, 1)',
+                                'rgba(52, 152, 219, 1)',
+                                'rgba(168, 216, 234, 1)'
+                            ],
+                            borderWidth: 2,
+                            borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                labels: {
+                                    font: { size: 14, weight: 'bold' },
+                                    color: '#333',
+                                    padding: 20
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1,
+                                    font: { size: 12 },
+                                    color: '#666'
+                                },
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.05)',
+                                    borderDash: [5, 5]
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Count',
+                                    font: { weight: 'bold' },
+                                    color: '#333'
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    font: { size: 13, weight: '500' },
+                                    color: '#333'
+                                },
+                                grid: {
+                                    display: false
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Mood Types',
+                                    font: { weight: 'bold' },
+                                    color: '#333'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        
+        {% endif %}
+    });
+</script>
+
+<!-- ✅ CSS STYLING FOR ANALYTICS PAGE -->
+<style>
+    /* ========================================
+       MAIN CONTAINER
+       ======================================== */
+    
+    .analytics-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 40px 20px;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        min-height: 100vh;
+    }
+
+    .analytics-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .analytics-header h1 {
+        font-size: 36px;
+        color: #2c3e50;
+        margin-bottom: 10px;
+        font-weight: 700;
+    }
+
+    .analytics-header .subtitle {
+        font-size: 16px;
+        color: #666;
+        font-weight: 500;
+    }
+
+    /* ========================================
+       STATISTICS CARDS GRID
+       ======================================== */
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-bottom: 40px;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        display: flex;
+        gap: 15px;
+        align-items: center;
+        transition: all 0.3s ease;
+        border-left: 4px solid #667eea;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .stat-card.total {
+        border-left-color: #667eea;
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(102, 126, 234, 0.05) 100%);
+    }
+
+    .stat-card.most-common {
+        border-left-color: #f39c12;
+        background: linear-gradient(135deg, rgba(243, 156, 18, 0.1) 0%, rgba(243, 156, 18, 0.05) 100%);
+    }
+
+    .stat-card.happy {
+        border-left-color: #FDB750;
+        background: linear-gradient(135deg, rgba(253, 183, 80, 0.1) 0%, rgba(253, 183, 80, 0.05) 100%);
+    }
+
+    .stat-card.sad {
+        border-left-color: #3498db;
+        background: linear-gradient(135deg, rgba(52, 152, 219, 0.1) 0%, rgba(52, 152, 219, 0.05) 100%);
+    }
+
+    .stat-card.stressed {
+        border-left-color: #A8D8EA;
+        background: linear-gradient(135deg, rgba(168, 216, 234, 0.1) 0%, rgba(168, 216, 234, 0.05) 100%);
+    }
+
+    .stat-icon {
+        font-size: 36px;
+        text-align: center;
+        min-width: 50px;
+    }
+
+    .stat-content h3 {
+        margin: 0;
+        font-size: 14px;
+        color: #999;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .stat-value {
+        margin: 8px 0 0 0;
+        font-size: 28px;
+        font-weight: 700;
+        color: #2c3e50;
+    }
+
+    .stat-percent {
+        margin: 5px 0 0 0;
+        font-size: 12px;
+        color: #999;
+    }
+
+    /* ========================================
+       CHART SECTION
+       ======================================== */
+
+    .chart-section {
+        background: white;
+        border-radius: 12px;
+        padding: 35px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        margin-bottom: 40px;
+    }
+
+    .chart-wrapper h2 {
+        font-size: 24px;
+        color: #2c3e50;
+        margin: 0 0 25px 0;
+        font-weight: 700;
+    }
+
+    .chart-container {
+        position: relative;
+        width: 100%;
+        height: 320px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #moodChart {
+        width: 100% !important;
+        height: 100% !important;
+        max-width: 100%;
+    }
+
+    /* ========================================
+       NO DATA MESSAGE
+       ======================================== */
+
+    .no-data {
+        text-align: center;
+        padding: 60px 20px;
+    }
+
+    .no-data p {
+        font-size: 18px;
+        color: #666;
+        margin-bottom: 25px;
+    }
+
+    .btn-detect {
+        display: inline-block;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 14px 30px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-detect:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    /* ========================================
+       INSIGHTS SECTION
+       ======================================== */
+
+    .insights-section {
+        margin-top: 40px;
+    }
+
+    .insights-section h2 {
+        font-size: 24px;
+        color: #2c3e50;
+        margin-bottom: 25px;
+        font-weight: 700;
+    }
+
+    .insights-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+    }
+
+    .insight-card {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        border-top: 4px solid #667eea;
+        transition: all 0.3s ease;
+    }
+
+    .insight-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .insight-card.positive {
+        border-top-color: #FDB750;
+        background: linear-gradient(135deg, rgba(253, 183, 80, 0.05) 0%, rgba(253, 183, 80, 0.02) 100%);
+    }
+
+    .insight-card.cautious {
+        border-top-color: #3498db;
+        background: linear-gradient(135deg, rgba(52, 152, 219, 0.05) 0%, rgba(52, 152, 219, 0.02) 100%);
+    }
+
+    .insight-card.calm {
+        border-top-color: #A8D8EA;
+        background: linear-gradient(135deg, rgba(168, 216, 234, 0.05) 0%, rgba(168, 216, 234, 0.02) 100%);
+    }
+
+    .insight-card.balanced {
+        border-top-color: #9b59b6;
+        background: linear-gradient(135deg, rgba(155, 89, 182, 0.05) 0%, rgba(155, 89, 182, 0.02) 100%);
+    }
+
+    .insight-card h3 {
+        margin: 0 0 12px 0;
+        color: #2c3e50;
+        font-size: 18px;
+        font-weight: 600;
+    }
+
+    .insight-card p {
+        margin: 0;
+        color: #666;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    /* ========================================
+       RESPONSIVE DESIGN
+       ======================================== */
+
+    @media (max-width: 768px) {
+        .analytics-container {
+            padding: 25px 15px;
+        }
+
+        .analytics-header h1 {
+            font-size: 26px;
+        }
+
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .stat-card {
+            padding: 15px;
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .stat-icon {
+            font-size: 32px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+        }
+
+        .chart-section {
+            padding: 20px;
+        }
+
+        #moodChart {
+            max-height: 350px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .analytics-container {
+            padding: 15px 10px;
+        }
+
+        .analytics-header h1 {
+            font-size: 20px;
+        }
+
+        .stats-grid {
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .chart-section {
+            padding: 15px;
+        }
+
+        .insights-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+</style>
+
+{% endblock %}

@@ -1,0 +1,480 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mood Detected - Mood Recommender{% endblock %}
+
+{% block content %}
+<!-- ✅ DYNAMIC MOOD-BASED WRAPPER -->
+<div class="mood-wrapper {{ detected_mood|lower }}">
+    <div class="container">
+        <div class="card result-section">
+
+            <!-- TITLE -->
+            <h1 class="result-title">🎯 Your Mood Detected!</h1>
+
+            <!-- DETECTED MOOD DISPLAY -->
+            <div class="mood-result-card">
+                
+                <!-- MOOD EMOJI & NAME -->
+                <div class="mood-emoji">
+                    {% if detected_mood == "Happy" %}
+                        😊
+                    {% elif detected_mood == "Sad" %}
+                        😢
+                    {% elif detected_mood == "Stressed" %}
+                        😤
+                    {% else %}
+                        🎵
+                    {% endif %}
+                </div>
+
+                <div class="mood-name">{{ detected_mood }}</div>
+
+                <!-- ✅ MOOD-SPECIFIC MESSAGE (CONDITIONAL) -->
+                <div class="mood-message">
+                    {% if detected_mood == "Happy" %}
+                        <!-- 😊 HAPPY MESSAGE -->
+                        <p>🎉 You're feeling great! Your positive energy is contagious. Let's play some uplifting feel-good music to celebrate your wonderful mood!</p>
+                        <p class="secondary-message">Keep spreading those good vibes! 🌟</p>
+                    
+                    {% elif detected_mood == "Sad" %}
+                        <!-- 😢 SAD MESSAGE -->
+                        <p>💔 We sense some sadness in your words. That's okay, emotions are valid. We have beautiful, soulful songs that truly understand what you're going through.</p>
+                        <p class="secondary-message">Music will be your companion through this. 💙</p>
+                    
+                    {% elif detected_mood == "Stressed" %}
+                        <!-- 😤 STRESSED MESSAGE -->
+                        <p>🌿 You seem a bit overwhelmed right now. Take a deep breath—you've got this! Let's calm your mind with soothing, relaxing music to ease the tension.</p>
+                        <p class="secondary-message">Sometimes you just need to slow down and breathe. 🧘</p>
+                    
+                    {% else %}
+                        <!-- DEFAULT MESSAGE -->
+                        <p>🎵 Your mood is unique and special. Let's find the perfect playlist just for you!</p>
+                    {% endif %}
+                </div>
+
+            </div>
+
+            <!-- YOUR INPUT TEXT -->
+            <div class="input-display-section">
+                <h3>📝 Your Text:</h3>
+                <div class="user-input-box">
+                    {{ user_text }}
+                </div>
+            </div>
+
+            <!-- ACTIONS -->
+            <div class="action-buttons">
+                
+                <!-- PLAY PLAYLIST BUTTON -->
+                <a href="{% url 'playlist' detected_mood|lower %}" class="mood-btn play-btn">
+                    ▶️ Play {{ detected_mood }} Playlist
+                </a>
+
+                <!-- BACK TO HOME BUTTON -->
+                <a href="{% url 'home' %}" class="mood-btn home-btn">
+                    🏠 Back to Home
+                </a>
+
+                <!-- ANOTHER DETECTION BUTTON -->
+                <a href="{% url 'mood_input' %}" class="mood-btn another-btn">
+                    🔄 Detect Again
+                </a>
+
+            </div>
+
+            <!-- MOTIVATION MESSAGE -->
+            <div class="motivation-box">
+                <p>✨ <strong>Remember:</strong> Music has the power to transform your mood and uplift your spirit. Enjoy every moment! 🎶</p>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- ✅ COMPREHENSIVE CSS FOR DYNAMIC MOOD THEMING -->
+<style>
+    /* ========================================
+       MOOD-BASED THEME VARIABLES & WRAPPER
+       ======================================== */
+    
+    .mood-wrapper {
+        min-height: 100vh;
+        padding: 20px 0;
+        transition: all 0.8s ease-in-out;
+        /* Default styling */
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    /* 😊 HAPPY MOOD - Bright & Cheerful */
+    .mood-wrapper.happy {
+        background: linear-gradient(135deg, #FFD89B 0%, #FDB750 50%, #F7CE68 100%);
+        color: #333;
+    }
+
+    .mood-wrapper.happy .result-title,
+    .mood-wrapper.happy .input-display-section h3 {
+        color: #2c3e50;
+    }
+
+    .mood-wrapper.happy .mood-result-card {
+        background: linear-gradient(135deg, #FDB750 0%, #F7CE68 100%);
+        box-shadow: 0 12px 30px rgba(253, 183, 80, 0.4);
+    }
+
+    .mood-wrapper.happy .mood-btn.play-btn {
+        background: linear-gradient(135deg, #1DB954 0%, #1ed760 100%);
+    }
+
+    .mood-wrapper.happy .mood-btn.play-btn:hover {
+        background: linear-gradient(135deg, #1ed760 0%, #1DB954 100%);
+    }
+
+    /* 😢 SAD MOOD - Dark & Contemplative */
+    .mood-wrapper.sad {
+        background: linear-gradient(135deg, #2C3E50 0%, #34495E 50%, #1A252F 100%);
+        color: #ecf0f1;
+    }
+
+    .mood-wrapper.sad .result-title,
+    .mood-wrapper.sad .input-display-section h3 {
+        color: #ecf0f1;
+    }
+
+    .mood-wrapper.sad .mood-result-card {
+        background: linear-gradient(135deg, #34495E 0%, #2C3E50 100%);
+        color: #ecf0f1;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .mood-wrapper.sad .mood-message {
+        background: rgba(255, 255, 255, 0.1) !important;
+        color: #ecf0f1;
+    }
+
+    .mood-wrapper.sad .user-input-box {
+        background: rgba(255, 255, 255, 0.05);
+        color: #ecf0f1;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .mood-wrapper.sad .input-display-section {
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .mood-wrapper.sad .mood-btn.home-btn {
+        background: #3498db;
+    }
+
+    .mood-wrapper.sad .mood-btn.home-btn:hover {
+        background: #2980b9;
+    }
+
+    /* 😤 STRESSED MOOD - Calm & Soothing */
+    .mood-wrapper.stressed {
+        background: linear-gradient(135deg, #A8D8EA 0%, #AA96DA 50%, #FCFCFC 100%);
+        color: #333;
+    }
+
+    .mood-wrapper.stressed .result-title,
+    .mood-wrapper.stressed .input-display-section h3 {
+        color: #2c3e50;
+    }
+
+    .mood-wrapper.stressed .mood-result-card {
+        background: linear-gradient(135deg, #A8D8EA 0%, #AA96DA 100%);
+        color: #fff;
+        box-shadow: 0 12px 30px rgba(168, 216, 234, 0.4);
+    }
+
+    .mood-wrapper.stressed .mood-message {
+        background: rgba(255, 255, 255, 0.2) !important;
+    }
+
+    .mood-wrapper.stressed .mood-btn.another-btn {
+        background: #9b59b6;
+    }
+
+    .mood-wrapper.stressed .mood-btn.another-btn:hover {
+        background: #8e44ad;
+    }
+
+    /* ========================================
+       BASE RESULT CARD STYLING
+       ======================================== */
+
+    .result-section {
+        max-width: 600px;
+        margin: 30px auto;
+        text-align: center;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 12px;
+        padding: 40px 30px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    }
+
+    .mood-wrapper.sad .result-section {
+        background: rgba(0, 0, 0, 0.2);
+        backdrop-filter: blur(10px);
+    }
+
+    .result-title {
+        font-size: 32px;
+        margin-bottom: 30px;
+        font-weight: 700;
+        transition: color 0.6s ease;
+    }
+
+    /* ========================================
+       MOOD RESULT CARD
+       ======================================== */
+
+    .mood-result-card {
+        border-radius: 12px;
+        padding: 40px 30px;
+        color: white;
+        margin-bottom: 30px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        transition: all 0.8s ease-in-out;
+    }
+
+    .mood-emoji {
+        font-size: 80px;
+        margin-bottom: 15px;
+        animation: bounce 0.6s ease-in-out;
+        transition: font-size 0.3s ease;
+    }
+
+    @keyframes bounce {
+        0%, 100% {
+            transform: translateY(0);
+        }
+        50% {
+            transform: translateY(-20px);
+        }
+    }
+
+    .mood-name {
+        font-size: 36px;
+        font-weight: bold;
+        margin-bottom: 20px;
+        transition: color 0.6s ease;
+    }
+
+    .mood-message {
+        font-size: 16px;
+        line-height: 1.8;
+        background: rgba(255, 255, 255, 0.15);
+        padding: 20px;
+        border-radius: 8px;
+        transition: all 0.6s ease;
+    }
+
+    .mood-message p {
+        margin: 10px 0;
+    }
+
+    .mood-message .secondary-message {
+        font-size: 14px;
+        font-weight: 500;
+        margin-top: 15px;
+        opacity: 0.9;
+    }
+
+    /* ========================================
+       INPUT DISPLAY SECTION
+       ======================================== */
+
+    .input-display-section {
+        text-align: left;
+        background: #f9f9f9;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 25px;
+        border: 1px solid #eee;
+        transition: all 0.6s ease;
+    }
+
+    .input-display-section h3 {
+        margin: 0 0 12px 0;
+        font-size: 18px;
+        font-weight: 600;
+        transition: color 0.6s ease;
+    }
+
+    .user-input-box {
+        background: white;
+        padding: 15px;
+        border-radius: 6px;
+        border: 1px solid #ddd;
+        color: #555;
+        font-size: 14px;
+        line-height: 1.6;
+        word-wrap: break-word;
+        max-height: 150px;
+        overflow-y: auto;
+        transition: all 0.6s ease;
+    }
+
+    /* ========================================
+       ACTION BUTTONS
+       ======================================== */
+
+    .action-buttons {
+        display: grid;
+        gap: 12px;
+        margin-bottom: 25px;
+    }
+
+    .mood-btn {
+        padding: 14px 20px;
+        font-size: 16px;
+        border-radius: 8px;
+        font-weight: 600;
+        text-decoration: none;
+        color: white;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.4s ease;
+        border: none;
+        cursor: pointer;
+    }
+
+    .mood-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .mood-btn.play-btn {
+        background: linear-gradient(135deg, #1DB954 0%, #1ed760 100%);
+    }
+
+    .mood-btn.home-btn {
+        background: #667eea;
+    }
+
+    .mood-btn.home-btn:hover {
+        background: #5568d3;
+    }
+
+    .mood-btn.another-btn {
+        background: #f39c12;
+    }
+
+    .mood-btn.another-btn:hover {
+        background: #e67e22;
+    }
+
+    /* ========================================
+       MOTIVATION BOX
+       ======================================== */
+
+    .motivation-box {
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 8px;
+        padding: 20px;
+        color: #856404;
+        font-size: 14px;
+        line-height: 1.6;
+        transition: all 0.6s ease;
+    }
+
+    .mood-wrapper.happy .motivation-box {
+        background: rgba(253, 183, 80, 0.2);
+        border: 1px solid rgba(253, 183, 80, 0.4);
+        color: #2c3e50;
+    }
+
+    .mood-wrapper.sad .motivation-box {
+        background: rgba(52, 152, 219, 0.2);
+        border: 1px solid rgba(52, 152, 219, 0.4);
+        color: #ecf0f1;
+    }
+
+    .mood-wrapper.stressed .motivation-box {
+        background: rgba(168, 216, 234, 0.3);
+        border: 1px solid rgba(168, 216, 234, 0.5);
+        color: #2c3e50;
+    }
+
+    .motivation-box p {
+        margin: 0;
+    }
+
+    /* ========================================
+       RESPONSIVE DESIGN
+       ======================================== */
+
+    @media (max-width: 600px) {
+        .result-section {
+            padding: 25px 15px;
+        }
+
+        .result-title {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .mood-emoji {
+            font-size: 60px;
+        }
+
+        .mood-name {
+            font-size: 28px;
+            margin-bottom: 15px;
+        }
+
+        .mood-message {
+            font-size: 14px;
+            padding: 15px;
+        }
+
+        .action-buttons {
+            gap: 10px;
+        }
+
+        .mood-btn {
+            padding: 12px 16px;
+            font-size: 14px;
+        }
+
+        .input-display-section {
+            padding: 15px;
+        }
+
+        .user-input-box {
+            max-height: 120px;
+            font-size: 13px;
+        }
+    }
+
+    /* ========================================
+       ACCESSIBILITY & PRINT STYLES
+       ======================================== */
+
+    @media print {
+        .action-buttons {
+            display: none;
+        }
+    }
+
+    /* Ensure text is always readable */
+    .mood-wrapper.happy .result-section {
+        color: #333;
+    }
+
+    .mood-wrapper.sad .result-section {
+        color: #ecf0f1;
+    }
+
+    .mood-wrapper.stressed .result-section {
+        color: #2c3e50;
+    }
+
+</style>
+
+{% endblock %}

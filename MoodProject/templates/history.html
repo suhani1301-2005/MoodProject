@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="history-container">
+
+    <!-- HEADER -->
+    <div class="history-header">
+        <h1 class="history-title">🎧 Mood History 😊</h1>
+        <p class="history-subtitle">Track your mood journey over time</p>
+    </div>
+
+    <!-- FILTER BUTTONS -->
+    <div class="filters">
+        <button onclick="filterMood('all', this)" class="filter-btn active">All</button>
+        <button onclick="filterMood('Happy', this)" class="filter-btn">😊 Happy</button>
+        <button onclick="filterMood('Sad', this)" class="filter-btn">💙 Sad</button>
+        <button onclick="filterMood('Stressed', this)" class="filter-btn">🌿 Stressed</button>
+    </div>
+
+    <div class="history-grid">
+
+        <!-- LEFT SIDE -->
+        <div class="history-box">
+
+            <div class="table-head">
+                <span>Date & Time</span>
+                <span>Mood</span>
+            </div>
+
+            {% for item in data %}
+            <div class="table-row" data-mood="{{ item.mood }}">
+                <span>{{ item.date_formatted }}</span>
+                <span class="mood-tag {{ item.mood|lower }}">
+                    {{ item.mood }}
+                </span>
+            </div>
+            {% empty %}
+            <p style="text-align:center;">No history yet 😢</p>
+            {% endfor %}
+
+        </div>
+
+        <!-- RIGHT SIDE -->
+        <div class="stats-container">
+
+            <!-- STATS -->
+            <div class="stats-box">
+                <h3>📊 Stats</h3>
+                <p>Total: {{ total }}</p>
+                <p>😊 Happy: {{ happy }}</p>
+                <p>💙 Sad: {{ sad }}</p>
+                <p>🌿 Stressed: {{ stressed }}</p>
+            </div>
+
+            <!-- CHART -->
+            <div class="mood-insights">
+                <h3>📈 Mood Chart</h3>
+                <canvas id="moodChart"></canvas>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- CHART JS -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+const ctx = document.getElementById('moodChart');
+
+// Safe values (no error if empty)
+const happy = Number("{{ happy|default:0 }}");
+const sad = Number("{{ sad|default:0 }}");
+const stressed = Number("{{ stressed|default:0 }}");
+
+new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+        labels: ['Happy', 'Sad', 'Stressed'],
+        datasets: [{
+            data: [happy, sad, stressed],
+            backgroundColor: ['#FFD700', '#6495ED', '#FF6B6B']
+        }]
+    }
+});
+
+// FILTER FUNCTION (FIXED)
+function filterMood(mood, btn) {
+
+    let rows = document.querySelectorAll('.table-row');
+
+    document.querySelectorAll('.filter-btn')
+        .forEach(b => b.classList.remove('active'));
+
+    btn.classList.add('active');
+
+    rows.forEach(row => {
+        if (mood === 'all' || row.dataset.mood === mood) {
+            row.style.display = 'flex';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+</script>
+
+{% endblock %}

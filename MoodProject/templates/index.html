@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Home - Mood Recommender{% endblock %}
+
+{% block content %}
+<div class="homepage-wrapper">
+    <div class="container">
+        <div class="card welcome-section">
+
+            <!-- TITLE SECTION -->
+            <div class="title-section">
+                <h1 class="welcome-title">Welcome Back!</h1>
+                <p class="welcome-subtitle">
+                    Select your mood & enjoy your music ✨
+                </p>
+            </div>
+
+            <!-- MOOD BUTTONS (ENHANCED) -->
+            <form method="POST" class="mood-buttons">
+                {% csrf_token %}
+
+                <button type="submit" class="mood-btn happy" name="mood" value="Happy">
+                    😊 Happy
+                </button>
+
+                <button type="submit" class="mood-btn sad" name="mood" value="Sad">
+                    😢 Sad
+                </button>
+
+                <button type="submit" class="mood-btn stressed" name="mood" value="Stressed">
+                    😤 Stressed
+                </button>
+            </form>
+
+            <!-- DIVIDER -->
+            <div class="divider-section">
+                <p class="ai-subtitle">or let AI detect your mood →</p>
+            </div>
+
+            <!-- AI MOOD DETECTION BUTTON -->
+            <div class="ai-mood-section">
+                <a href="{% url 'mood_input' %}" class="mood-btn ai-btn">
+                    🤖 AI Mood Detection
+                </a>
+            </div>
+
+            <!-- TAGLINE -->
+            <p class="tagline">Music changes everything 🎵</p>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}

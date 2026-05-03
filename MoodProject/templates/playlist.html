@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="playlist-wrapper">
+    <!-- GLASSMORPHISM CARD -->
+    <div class="playlist-card">
+        
+        <!-- HEADER WITH ALBUM ART -->
+        <div class="card-header">
+            <div class="album-art">
+                <img src="{% static image %}" alt="Album Cover">
+            </div>
+            
+            <div class="header-info">
+                <p class="playlist-label">Public Playlist</p>
+                <h1 class="playlist-title">{{ title }}</h1>
+                <p class="playlist-subtitle">Enjoy your favorite tracks 🎧</p>
+            </div>
+        </div>
+
+        <!-- TRACK LIST -->
+        <div class="tracks-container">
+            <div class="tracks-list">
+                {% for song in songs %}
+                <div class="track-item" onclick="playSong('{{ song.file }}', this)" data-title="{{ song.title|lower }}" data-mood="{{ song.mood|default:'all'|lower }}">
+                    <div class="track-number">{{ forloop.counter }}</div>
+                    
+                    <div class="track-icon">
+                        <span class="play-icon" data-playing="false">▶</span>
+                    </div>
+                    
+                    <div class="track-info">
+                        <div class="track-title">{{ song.title }}</div>
+                        <div class="track-artist">{{ song.artist }}</div>
+                    </div>
+                    
+                    <div class="track-duration">{{ song.duration|default:"3:45" }}</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- MUSIC PLAYER BAR -->
+    <div class="player-bar">
+        <div class="player-left">
+            <button class="player-button">
+                <span>⏮</span>
+            </button>
+            <button class="player-button play-button" onclick="togglePlay()">
+                <span id="playIcon">▶</span>
+            </button>
+            <button class="player-button">
+                <span>⏭</span>
+            </button>
+        </div>
+        
+        <div class="player-center">
+            <div class="now-playing">
+                <span class="now-playing-text" id="nowPlayingText">Select a song to play</span>
+            </div>
+        </div>
+        
+        <div class="player-progress">
+            <span class="time-current">0:00</span>
+            <div class="progress-track">
+                <div class="progress-bar" id="progressBar"></div>
+                <div class="progress-handle" id="progressHandle"></div>
+            </div>
+            <span class="time-total">0:00</span>
+        </div>
+        
+        <div class="player-right">
+            <button class="player-button stop-button" onclick="stopSong()" title="Stop Music">
+                <span>⏹</span>
+            </button>
+        </div>
+        
+        <audio id="player" style="display:none;"></audio>
+    </div>
+</div>
+
+<script>
+let currentPlayingTrack = null;
+
+function playSong(file, el) {
+    const player = document.getElementById("player");
+    player.src = "/static/music/" + file;
+    player.play();
+
+    // Update all track icons
+    document.querySelectorAll('.track-item').forEach(track => {
+        const icon = track.querySelector('.play-icon');
+        track.classList.remove('active');
+        icon.textContent = '▶';
+        icon.dataset.playing = 'false';
+    });
+    
+    el.classList.add('active');
+    const playIcon = el.querySelector('.play-icon');
+    playIcon.textContent = '⏸';
+    playIcon.dataset.playing = 'true';
+    currentPlayingTrack = el;
+    
+    // Update now playing text
+    const title = el.querySelector('.track-title').textContent;
+    const artist = el.querySelector('.track-artist').textContent;
+    document.getElementById('nowPlayingText').textContent = title + ' — ' + artist;
+    document.getElementById('playIcon').textContent = '⏸';
+}
+
+function togglePlay() {
+    const player = document.getElementById("player");
+    const playIcon = document.getElementById("playIcon");
+    
+    if (currentPlayingTrack) {
+        const trackIcon = currentPlayingTrack.querySelector('.play-icon');
+        if (player.paused) {
+            player.play();
+            playIcon.textContent = '⏸';
+            trackIcon.textContent = '⏸';
+            trackIcon.dataset.playing = 'true';
+        } else {
+            player.pause();
+            playIcon.textContent = '▶';
+            trackIcon.textContent = '▶';
+            trackIcon.dataset.playing = 'false';
+        }
+    }
+}
+
+function stopSong() {
+    const player = document.getElementById("player");
+    
+    // Stop the music
+    player.pause();
+    player.src = '';  // Clear the source
+    
+    // Reset all track icons
+    document.querySelectorAll('.track-item').forEach(track => {
+        const icon = track.querySelector('.play-icon');
+        track.classList.remove('active');
+        icon.textContent = '▶';
+        icon.dataset.playing = 'false';
+    });
+    
+    // Reset player bar
+    document.getElementById('playIcon').textContent = '▶';
+    document.getElementById('nowPlayingText').textContent = 'Select a song to play';
+    currentPlayingTrack = null;
+}
+
+function filterTracks(mood) {
+    // Update active button
+    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    
+    // Filter tracks
+    const tracks = document.querySelectorAll('.track-item');
+    tracks.forEach(track => {
+        const trackMood = track.dataset.mood;
+        if (mood === 'all' || trackMood === mood) {
+            track.style.display = 'flex';
+        } else {
+            track.style.display = 'none';
+        }
+    });
+}
+
+// Update progress bar
+document.addEventListener('DOMContentLoaded', function() {
+    const player = document.getElementById('player');
+    const progressBar = document.getElementById('progressBar');
+    const progressHandle = document.getElementById('progressHandle');
+    
+    player.addEventListener('timeupdate', function() {
+        const percent = (player.currentTime / player.duration) * 100;
+        progressBar.style.width = percent + '%';
+        progressHandle.style.left = percent + '%';
+    });
+    
+    // Update play icon when audio ends
+    player.addEventListener('ended', function() {
+        if (currentPlayingTrack) {
+            const trackIcon = currentPlayingTrack.querySelector('.play-icon');
+            trackIcon.textContent = '▶';
+            trackIcon.dataset.playing = 'false';
+        }
+        document.getElementById('playIcon').textContent = '▶';
+    });
+});
+</script>
+
+{% endblock %}

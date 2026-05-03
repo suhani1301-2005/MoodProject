@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+
+    <!-- 🔥 TOP SECTION -->
+    <div class="top-section">
+
+        <!-- LEFT: TOP RESULT -->
+        <div class="top-result">
+            <h2>Top Result</h2>
+
+            <!-- ✅ CLICKABLE CARD -->
+            <div class="top-card" onclick="window.location.href='{% url 'playlist' 'happy' %}'">
+                <img src="{% static 'images/p3.jpg' %}">
+                <h3>Happy Playlist</h3>
+                <p>Playlist • Mood</p>
+            </div>
+        </div>
+
+        <!-- RIGHT: SONG LIST -->
+        <div class="songs-list">
+            <h2>Songs</h2>
+
+            {% for p in playlists %}
+                {% for song in p.songs %}
+                <div class="song-row" onclick="playSong('{{ song.file }}', this)">
+                    ▶ {{ song.title }}
+                </div>
+                {% endfor %}
+            {% endfor %}
+        </div>
+
+    </div>
+
+    <!-- 🔥 BOTTOM PLAYLIST CARDS -->
+    <div class="playlist-section">
+        <h2>Playlists</h2>
+
+        <div class="playlist-grid">
+
+            <div class="playlist-card-img">
+                <img src="{% static 'images/p3.jpg' %}">
+                <p>Happy Vibes</p>
+            </div>
+
+            <div class="playlist-card-img">
+                <img src="{% static 'images/sad.jpg' %}">
+                <p>Chill Mood</p>
+            </div>
+
+            <div class="playlist-card-img">
+                <img src="{% static 'images/stressed.jpg' %}">
+                <p>Relax Hits</p>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- AUDIO PLAYER -->
+    <audio id="player" controls style="width:100%; margin-top:20px;"></audio>
+
+</div>
+
+<!-- JS -->
+<script>
+function playSong(file, el) {
+    const player = document.getElementById("player");
+
+    player.src = "/static/music/" + file;
+    player.play();
+
+    document.querySelectorAll('.song-row').forEach(e => e.classList.remove('active'));
+    el.classList.add('active');
+}
+</script>
+
+{% endblock %}

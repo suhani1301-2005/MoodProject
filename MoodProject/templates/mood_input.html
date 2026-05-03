@@ -1,0 +1,210 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}AI Mood Detection - Mood Recommender{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="card welcome-section">
+
+        <!-- TITLE -->
+        <h1 class="welcome-title">🤖 AI Mood Detection</h1>
+        <p class="welcome-subtitle">
+            Tell us how you feel & let AI detect your mood ✨
+        </p>
+
+        <!-- MOOD INPUT FORM -->
+        <form method="POST" action="{% url 'mood_detect' %}" class="mood-input-form">
+            {% csrf_token %}
+
+            <!-- TEXTAREA -->
+            <div class="form-group">
+                <label for="mood_text">How are you feeling right now?</label>
+                <textarea 
+                    id="mood_text"
+                    name="mood_text"
+                    class="mood-textarea"
+                    placeholder="Type your feelings, thoughts, or current state... e.g., 'I am so happy and excited today!' or 'I feel sad and lonely'"
+                    rows="6"
+                    required
+                ></textarea>
+            </div>
+
+            <!-- ERROR MESSAGES -->
+            {% if messages %}
+                <div class="messages">
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- BUTTONS -->
+            <div class="button-group">
+                <button type="submit" class="mood-btn detect-btn">
+                    🎯 Detect My Mood
+                </button>
+                <a href="{% url 'home' %}" class="mood-btn cancel-btn">
+                    ⬅️ Back to Home
+                </a>
+            </div>
+
+        </form>
+
+        <!-- INSTRUCTIONS -->
+        <div class="instructions-section">
+            <h3>📝 How it works:</h3>
+            <ul>
+                <li>Write a few sentences about how you feel</li>
+                <li>Our AI will analyze the sentiment</li>
+                <li>You'll get a mood recommendation</li>
+                <li>Enjoy music tailored to your mood!</li>
+            </ul>
+        </div>
+
+    </div>
+</div>
+
+<!-- CSS FOR MOOD INPUT -->
+<style>
+    .mood-input-form {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        margin: 30px 0;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .form-group label {
+        font-size: 16px;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .mood-textarea {
+        padding: 15px;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        font-size: 14px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        resize: vertical;
+        transition: border-color 0.3s ease;
+    }
+
+    .mood-textarea:focus {
+        outline: none;
+        border-color: #1DB954;
+        box-shadow: 0 0 8px rgba(29, 185, 84, 0.3);
+    }
+
+    .button-group {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .detect-btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        flex: 1;
+        min-width: 200px;
+    }
+
+    .detect-btn:hover {
+        background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        transform: translateY(-2px);
+    }
+
+    .cancel-btn {
+        background: #999;
+        flex: 1;
+        min-width: 200px;
+        text-decoration: none;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .cancel-btn:hover {
+        background: #777;
+    }
+
+    .messages {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .alert {
+        padding: 12px 15px;
+        border-radius: 6px;
+        font-size: 14px;
+    }
+
+    .alert-error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+
+    .alert-success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+
+    .instructions-section {
+        margin-top: 30px;
+        padding: 20px;
+        background: #f5f5f5;
+        border-radius: 8px;
+        border-left: 4px solid #667eea;
+    }
+
+    .instructions-section h3 {
+        margin: 0 0 15px 0;
+        color: #333;
+    }
+
+    .instructions-section ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .instructions-section li {
+        padding: 8px 0;
+        padding-left: 25px;
+        position: relative;
+        color: #555;
+    }
+
+    .instructions-section li:before {
+        content: "✓";
+        position: absolute;
+        left: 0;
+        color: #667eea;
+        font-weight: bold;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 600px) {
+        .button-group {
+            flex-direction: column;
+        }
+
+        .detect-btn,
+        .cancel-btn {
+            width: 100%;
+        }
+    }
+</style>
+
+{% endblock %}
