@@ -1,13 +1,8 @@
-import os
 from pymongo import MongoClient
 from datetime import datetime
 
 # MongoDB connection
-MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017/")
-if "mongodb+srv" in MONGO_URI or "mongodb.net" in MONGO_URI:
-    client = MongoClient(MONGO_URI, tlsAllowInvalidCertificates=True, serverSelectionTimeoutMS=5000)
-else:
-    client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000)
+client = MongoClient("mongodb://localhost:27017/")
 
 # Database
 db = client["mood_db"]
